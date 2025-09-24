@@ -1,6 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-
+  
 namespace ServerManagementApp1.Models;
 
 public class Server
