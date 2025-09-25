@@ -97,6 +97,15 @@
     {
         selectedCity = cityName;
         servers = ServersRepository.GetServersByCity(selectedCity);
+
+        // Loop for adding many different servers
+        // if (cityName == "Halifax")
+        // {
+        //     for (var i = 16; i < 2000; i++)
+        //     {
+        //         servers.Add(new Server { ServerId = i, Name = $"Server{i}", City = "Halifax" });
+        //     }
+        // }
     }
 
     private void HandleServerSearch()
