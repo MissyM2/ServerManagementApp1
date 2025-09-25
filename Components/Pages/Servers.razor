@@ -1,4 +1,5 @@
 ﻿@page "/servers"
+@rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
 <h3>Servers</h3>
@@ -10,10 +11,12 @@
         @foreach (var city in cities)
         {
             <div class="col">
-                <div class="card">
+                <div
+                    class="card @(selectedCity.Equals(city, StringComparison.OrdinalIgnoreCase) ? "border-primary" : "")">
                     <img src="@($"/images/{city}.png")" class="card-img-top" alt="...">
                     <div class="card-body">
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary"
+                                @onclick="@(() => { DisplayServersByCity(city); })">
                             @city
                         </button>
                     </div>
@@ -24,6 +27,13 @@
     </div>
 </div>
 <br/>
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Search servers" @onchange="HandleServerFilterChanged"/>
+    <button class="btn btn-outline-secondary" type="button" id="button-search" @onclick="HandleServerSearch">Search
+    </button>
+</div>
+@serverFilter
 <ul>
     @foreach (var server in servers)
     {
@@ -51,8 +61,11 @@
 
 
 @code {
-    private readonly List<Server> servers = ServersRepository.GetServersByCity("Toronto");
+    private List<Server> servers = ServersRepository.GetServersByCity("Toronto");
     private readonly List<string> cities = CitiesRepository.GetCities();
+    private string selectedCity = "Toronto";
+    private string serverFilter = "";
+
 
     private void DeleteServer(int serverId)
     {
@@ -62,5 +75,23 @@
             NavigationManager.NavigateTo("/servers");
         }
     }
+
+    private void DisplayServersByCity(string cityName)
+    {
+        selectedCity = cityName;
+        servers = ServersRepository.GetServersByCity(selectedCity);
+    }
+
+    private void HandleServerFilterChanged(ChangeEventArgs args)
+    {
+        serverFilter = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private void HandleServerSearch()
+    {
+        servers = ServersRepository.SearchServers(serverFilter);
+        selectedCity = string.Empty;
+    }
+
 
 }
