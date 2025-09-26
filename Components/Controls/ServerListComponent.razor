@@ -2,7 +2,7 @@
 
 @if (servers != null && servers.Count > 0)
 {
-    <ul>
+    <ul class="list-unstyled">
         <Virtualize Items="servers" Context="server">
             <ServerComponent Server="server"></ServerComponent>
         </Virtualize>
