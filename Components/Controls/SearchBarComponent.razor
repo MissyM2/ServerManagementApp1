@@ -1,4 +1,4 @@
-<div class="input-group mb-3 input-width">
+<div class="input-group mb-3 input-width" @attributes="OtherAttributes">
     <input type="text" class="form-control" placeholder="Search servers"
            @bind-value="serverFilter"
            @bind-value:event="oninput"/>
@@ -7,6 +7,10 @@
 </div>
 
 @code {
+    [Parameter] public EventCallback<string> ServerSearchCallback { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? OtherAttributes { get; set; }
 
     public void ClearFilter()
     {
@@ -15,7 +19,6 @@
 
     private string serverFilter = "";
 
-    [Parameter] public EventCallback<string> ServerSearchCallback { get; set; }
 
     private void HandleServerSearch()
     {
