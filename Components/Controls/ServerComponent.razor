@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 @if (Server != null)
 {
@@ -8,29 +9,19 @@
             @(Server.IsOnline ? "online" : "offline")
         </span>
 
-        <button type="button" class="btn btn-link" @onclick="@(() => { editingServer = !editingServer; })">
-            Edit
-        </button>
+        <a href="/servers/@Server.ServerId" class="btn btn-link">Edit</a>
         &nbsp;
         <EditForm
             Model="Server"
             FormName="@($"form-server-{Server.ServerId}")"
             OnValidSubmit="@(() => { DeleteServer(Server.ServerId); })">
-            <button type="submit" class="btn btn-primary">Delete
-            </button>
+            <button type="submit" class="btn btn-primary">Delete</button>
         </EditForm>
-
-        @if (editingServer)
-        {
-            <ServerManagementApp1.Components.Pages.EditServer
-                Id="Server.ServerId"></ServerManagementApp1.Components.Pages.EditServer>
-        }
     </li>
 }
 
 
 @code {
-    private bool editingServer;
     [Parameter] public Server? Server { get; set; }
 
     private void DeleteServer(int serverId)
