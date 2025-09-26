@@ -6,57 +6,23 @@
 <br/>
 <br/>
 
-<div class="container-fluid text-center">
-    <div class="row w-50">
-        @foreach (var city in cities)
-        {
-            <div class="col">
-                <div
-                    class="card @(selectedCity.Equals(city, StringComparison.OrdinalIgnoreCase) ? "border-primary" : "")">
-                    <img src="@($"/images/{city}.png")" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <button type="button" class="btn btn-primary"
-                                @onclick="@(() => { DisplayServersByCity(city); })">
-                            @city
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        }
-    </div>
-</div>
+<CityListComponent
+    @ref="cityListComponent"
+    @rendermode="InteractiveServer"
+    SelectCityCallback="HandleCitySelection">
+</CityListComponent>
 <br/>
+<SearchBarComponent
+    @ref="searchBarComponent"
+    @rendermode="InteractiveServer"
+    ServerSearchCallback="HandleServerSearch">
+</SearchBarComponent>
 
-<div class="input-group mb-3">
-    <input type="text" class="form-control" placeholder="Search servers"
-           @bind-value="serverFilter"
-           @bind-value:event="oninput"/>
-    <button class="btn btn-outline-secondary" type="button" id="button-search" @onclick="HandleServerSearch">Search
-    </button>
-</div>
-
-<ul>
-    <Virtualize Items="servers" Context="server">
-        <li @key="server.ServerId">
-            @server.Name in @server.City is
-            <span style="color:@(server.IsOnline ? "green" : "red")">
-                @(server.IsOnline ? "online" : "offline")
-            </span>
-
-            <a href="/servers/@server.ServerId" class="btn btn-link">Edit</a>
-            &nbsp;
-            <EditForm
-                Model="server"
-                FormName="@($"form-server-{server.ServerId}")"
-                OnValidSubmit="@(() => { DeleteServer(server.ServerId); })">
-                <button type="submit" class="btn btn-primary">Delete</button>
-            </EditForm>
-        </li>
-    </Virtualize>
-
-    }
-</ul>
+<ServerListComponent
+    @rendermode="InteractiveServer"
+    CityName="@selectedCity"
+    SearchFilter="@searchFilter">
+</ServerListComponent>
 <p>
     <a href="/servers/add" class="btn btn-primary">Add Server</a>
 </p>
@@ -64,54 +30,22 @@
 
 
 @code {
-    private List<Server> servers = ServersRepository.GetServersByCity("Toronto");
-
-    private readonly List<string> cities = CitiesRepository.GetCities();
-
     private string selectedCity = "Toronto";
+    private string searchFilter = "";
 
-    private string _serverFilter = "";
+    private CityListComponent? cityListComponent;
+    private SearchBarComponent? searchBarComponent;
 
-    private string serverFilter
-    {
-        get => _serverFilter;
-        set
-        {
-            // do whatever you want here
-            _serverFilter = value;
-            servers = ServersRepository.SearchServers(_serverFilter);
-        }
-    }
-
-
-    private void DeleteServer(int serverId)
-    {
-        if (serverId > 0)
-        {
-            ServersRepository.DeleteServer(serverId);
-            NavigationManager.NavigateTo("/servers");
-        }
-    }
-
-    private void DisplayServersByCity(string cityName)
+    private void HandleCitySelection(string cityName)
     {
         selectedCity = cityName;
-        servers = ServersRepository.GetServersByCity(selectedCity);
-
-        // Loop for adding many different servers
-        // if (cityName == "Halifax")
-        // {
-        //     for (var i = 16; i < 2000; i++)
-        //     {
-        //         servers.Add(new Server { ServerId = i, Name = $"Server{i}", City = "Halifax" });
-        //     }
-        // }
+        searchFilter = string.Empty;
     }
 
-    private void HandleServerSearch()
+    private void HandleServerSearch(string searchFilter)
     {
-        servers = ServersRepository.SearchServers(serverFilter);
-        selectedCity = string.Empty;
+        this.searchFilter = searchFilter;
+        cityListComponent?.ClearSelection();
     }
 
 }
